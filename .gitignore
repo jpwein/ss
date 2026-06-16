@@ -1,0 +1,6 @@
+node_modules/
+database/*.db
+public/assets/user-submissions/*
+public/assets/snake-heads/*
+public/assets/notes/*
+.DS_Store

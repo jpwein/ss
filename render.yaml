@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: sekai-snake
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        fromService:
+          type: web
+          name: sekai-snake
+          envVarKey: PORT
+    autoDeploy: true
+    branch: main

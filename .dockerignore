@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+*.md
+docs
+database/*.db
+database/*.json
+public/assets/user-submissions/*
+!public/assets/user-submissions/.gitkeep

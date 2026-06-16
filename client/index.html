@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sekai-snake</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="background-layer"></div>
+  
+  <header class="logo-header">
+    <h1 class="game-logo">sekai-snake</h1>
+  </header>
+
+  <main class="main-container">
+    <div class="lobby-block left-block">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="login" id="tab-login"></button>
+        <button class="tab-btn" data-tab="register" id="tab-register"></button>
+      </div>
+      
+      <div class="tab-content active" id="login-tab">
+        <input type="text" class="input-field" id="login-username" placeholder="" maxlength="12">
+        <input type="password" class="input-field" id="login-password" placeholder="" maxlength="24">
+        <button class="action-btn" id="login-btn"></button>
+      </div>
+      
+      <div class="tab-content" id="register-tab">
+        <input type="text" class="input-field" id="register-username" placeholder="" maxlength="12">
+        <input type="password" class="input-field" id="register-password" placeholder="" maxlength="24">
+        <button class="action-btn" id="register-btn"></button>
+      </div>
+      
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="ru">RU</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+    </div>
+
+    <div class="lobby-block right-block">
+      <div id="after-login" style="display: none;">
+        <div class="customization-section">
+          <h2 id="customization-title"></h2>
+          <div class="color-grid" id="color-grid"></div>
+          <button class="action-btn" id="toggle-colors" style="margin-bottom: 15px;"></button>
+          <button class="action-btn" id="upload-head-btn"></button>
+        </div>
+        
+        <div class="server-section">
+          <h2 id="server-list-title"></h2>
+          <div class="server-list" id="server-list"></div>
+          
+          <h3 id="create-server-title" style="margin-top: 20px;"></h3>
+          <input type="text" class="input-field" id="new-server-name" placeholder="">
+          <div style="margin: 10px 0;">
+            <label>
+              <input type="radio" name="server-type" value="public" checked id="public-type">
+              <span id="public-label"></span>
+            </label>
+            <label style="margin-left: 15px;">
+              <input type="radio" name="server-type" value="private" id="private-type">
+              <span id="private-label"></span>
+            </label>
+          </div>
+          <input type="text" class="input-field" id="new-server-password" placeholder="" maxlength="4" style="display: none;">
+          <button class="action-btn" id="create-server-btn"></button>
+        </div>
+      </div>
+      
+      <button class="admin-btn" id="admin-btn" style="display: none;"></button>
+    </div>
+  </main>
+
+  <script src="locales/ru.js"></script>
+  <script src="locales/en.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "nextUserId": 3,
+  "nextServerId": 2,
+  "users": [
+    {
+      "id": 1,
+      "username": "wein",
+      "password": "041111",
+      "isAdmin": false
+    },
+    {
+      "id": 2,
+      "username": "weunnn",
+      "password": "041111",
+      "isAdmin": false
+    }
+  ],
+  "servers": [
+    {
+      "id": 1,
+      "name": "при",
+      "type": "public",
+      "password": null,
+      "creator": "wein"
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>sekai-snake - Game</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; font-family: Arial, sans-serif; touch-action: none; }
+    #game-container { width: 100vw; height: 100vh; }
+    #leaderboard {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.9);
+      padding: 20px;
+      border-radius: 12px;
+      min-width: 200px;
+      max-height: 40vh;
+      overflow-y: auto;
+    }
+    #leaderboard h3 { margin-bottom: 15px; }
+    .leaderboard-item { display: flex; justify-content: space-between; margin: 5px 0; }
+    #chat {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 300px;
+      max-width: 90vw;
+      background: rgba(255,255,255,0.9);
+      padding: 15px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    #chat.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(100%);
+    }
+    #chat-messages {
+      height: 150px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+    .chat-message { font-size: 14px; margin-bottom: 5px; }
+    .chat-message strong { color: #2d8a4e; }
+    #chat-input {
+      width: calc(100% - 80px);
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    #chat-send {
+      width: 70px;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      background: #2d8a4e;
+      color: white;
+      cursor: pointer;
+    }
+    #toggle-chat {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #2d8a4e;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 100;
+    }
+    #joystick-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 150px;
+      height: 150px;
+      display: none;
+    }
+    #joystick-base {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 50%;
+    }
+    #joystick-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+      background: rgba(0,0,0,0.6);
+      border-radius: 50%;
+    }
+    @media (max-width: 768px) {
+      #joystick-container { display: block; }
+      #leaderboard { top: 10px; right: 10px; padding: 15px; min-width: 150px; }
+      #toggle-chat { top: 10px; left: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container"></div>
+  
+  <button id="toggle-chat">💬 Чат</button>
+  
+  <div id="leaderboard">
+    <h3 id="leaderboard-title">Лидерборд</h3>
+    <div id="leaderboard-list"></div>
+  </div>
+
+  <div id="chat">
+    <div id="chat-messages"></div>
+    <input type="text" id="chat-input" placeholder="Написать сообщение...">
+    <button id="chat-send">Отпр.</button>
+  </div>
+
+  <div id="joystick-container">
+    <div id="joystick-base"></div>
+    <div id="joystick-handle"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
