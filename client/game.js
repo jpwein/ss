@@ -466,6 +466,7 @@ const createHeadBadge = (texture) => {
   return badge;
 };
 
+
 const createUsernameLabel = (name) => {
   const div = document.createElement('div');
   div.className = 'username-label';
@@ -508,10 +509,6 @@ const createSnake = (startX = 0, startZ = 0) => {
   snakeTrail = [];
   
   // Удаляем старые лейблы
-  if (localUsernameLabel) {
-    scene.remove(localUsernameLabel);
-    localUsernameLabel = null;
-  }
   if (localClanNameLabel) {
     scene.remove(localClanNameLabel);
     localClanNameLabel = null;
@@ -526,11 +523,6 @@ const createSnake = (startX = 0, startZ = 0) => {
   }
   for (let i = 0; i < length * TRAIL_STEP + 40; i++) {
     snakeTrail.push({ x: startX - i * (SNAKE_SEGMENT_DISTANCE / TRAIL_STEP), z: startZ });
-  }
-  
-  // Создаем никнейм
-  if (username) {
-    localUsernameLabel = createUsernameLabel(username);
   }
   
   setLocalHeadBadge();
@@ -578,7 +570,6 @@ const createOtherPlayer = (playerData) => {
     })),
     headUrl: playerData.headUrl || '',
     headBadge: null,
-    usernameLabel: null,
     clanNameLabel: null,
     clanId: playerData.clanId || null,
     clanName: playerData.clanName || null
@@ -591,11 +582,6 @@ const createOtherPlayer = (playerData) => {
       if (!current || !texture) return;
       current.headBadge = createHeadBadge(texture);
     });
-  }
-
-  // Создаем никнейм для другого игрока
-  if (player.username) {
-    player.usernameLabel = createUsernameLabel(player.username);
   }
   
   // Создаем лейбл клана для другого игрока
@@ -624,10 +610,6 @@ const removeOtherPlayer = (socketId) => {
   if (!player) return;
   player.segments.forEach(removeObject);
   removeObject(player.headBadge);
-  if (player.usernameLabel) {
-    scene.remove(player.usernameLabel);
-    player.usernameLabel = null;
-  }
   if (player.clanNameLabel) {
     scene.remove(player.clanNameLabel);
     player.clanNameLabel = null;
@@ -1228,29 +1210,18 @@ const updateAttachments = (time) => {
   if (snake.length) {
     placeBadge(localHeadBadge, snake[0], lastMoveDirection);
     
-    // Nick and clan Y position - above head
+    // Clan label Y position - above head
     const textY = 3.5;
     
-    // Обновляем никнейм
-    if (localUsernameLabel) {
-      localUsernameLabel.position.set(
-        snake[0].position.x, 
-        textY, 
-        snake[0].position.z
-      );
-      localUsernameLabel.element.style.opacity = burrowOpacity;
-    }
-    
-    // Обновляем лейбл клана (если есть) - на том же уровне, рядом с ником
+    // Обновляем лейбл клана (если есть)
     if (myClanId) {
       const clan = clans.find(c => c.id === myClanId);
       if (clan && clan.name) {
         if (!localClanNameLabel) {
           localClanNameLabel = createClanLabel(clan.name);
         }
-        const offset = 2.5;
         localClanNameLabel.position.set(
-          snake[0].position.x + offset,
+          snake[0].position.x,
           textY,
           snake[0].position.z
         );
@@ -1276,36 +1247,13 @@ const updateAttachments = (time) => {
     
     const textY = 3.5;
     
-    // Обновляем никнейм другого игрока
-    if (player.usernameLabel) {
-      player.usernameLabel.position.set(
-        head.position.x, 
-        textY, 
-        head.position.z
-      );
-      
-      let otherOpacity = 1;
-      for (const burrow of burrows) {
-        const dist = Math.hypot(head.position.x - burrow.x, head.position.z - burrow.z);
-        if (dist < burrow.innerRadius) {
-          otherOpacity = 0;
-          break;
-        } else if (dist < burrow.radius) {
-          otherOpacity = (dist - burrow.innerRadius) / (burrow.radius - burrow.innerRadius);
-          break;
-        }
-      }
-      player.usernameLabel.element.style.opacity = otherOpacity;
-    }
-    
-    // Обновляем лейбл клана другого игрока - на том же уровне рядом с ником
+    // Обновляем лейбл клана другого игрока
     if (player.clanName) {
       if (!player.clanNameLabel) {
         player.clanNameLabel = createClanLabel(player.clanName);
       }
-      const offset = 2.5;
       player.clanNameLabel.position.set(
-        head.position.x + offset, 
+        head.position.x, 
         textY, 
         head.position.z
       );
