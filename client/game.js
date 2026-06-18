@@ -73,13 +73,7 @@ const GROWTH_CONFIG = {
 };
 // ============================================
 
-// ============================================
-// НАСТРОЙКИ КОРОНЫ:
-const CROWN_CONFIG = {
-  customModelPath: '/assets/crowns/crown.png', // Путь к вашей кастомной текстуре/модели короны
-  useCustomTexture: false                      // Установите true, если хотите использовать свою корону
-};
-// ============================================
+
 
 // Change note size, points, texture and boosts here.
 const NOTE_TYPES = [
@@ -175,7 +169,6 @@ let serverCreatedAt = Date.now();
 let snake = [];
 let snakeTrail = [];
 let localHeadBadge = null;
-let localCrown = null;
 let localUsernameLabel = null; // Никнейм над нашей головой
 let localClanNameLabel = null; // Название клана над нашей головой
 let isGameStarted = false;
@@ -503,69 +496,10 @@ const setLocalHeadBadge = async () => {
   localHeadBadge = createHeadBadge(texture);
 };
 
-const createCrownModel = async () => {
-  const group = new THREE.Group();
-  
-  if (CROWN_CONFIG.useCustomTexture) {
-    // Используем кастомную текстуру для короны
-    const texture = await loadTexture(CROWN_CONFIG.customModelPath);
-    if (texture) {
-      // Создаем Sprite для автоматического поворота к камере
-      const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
-      const crownSprite = new THREE.Sprite(spriteMaterial);
-      crownSprite.scale.set(2.5, 2.5, 1);
-      crownSprite.position.y = 0;
-      group.add(crownSprite);
-    } else {
-      // Если текстурка не загрузилась, используем стандартную корону
-      createDefaultCrown(group);
-    }
-  } else {
-    // Стандартная корона
-    createDefaultCrown(group);
-  }
-  
-  group.scale.set(1.15, 1.15, 1.15);
-  scene.add(group);
-  return group;
-};
-
-const createDefaultCrown = (group) => {
-  const gold = new THREE.MeshStandardMaterial({
-    color: 0xf4c542,
-    roughness: 0.38,
-    metalness: 0.28
-  });
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.28, 18), gold);
-  base.position.y = 0.08;
-  group.add(base);
-
-  [-0.45, 0, 0.45].forEach((x, index) => {
-    const spike = new THREE.Mesh(new THREE.ConeGeometry(0.25, index === 1 ? 0.9 : 0.68, 16), gold);
-    spike.position.set(x, 0.58, 0);
-    group.add(spike);
-  });
-};
-
 const placeBadge = (badge, head, direction) => {
   if (!badge || !head) return;
   badge.position.set(head.position.x, 2.05, head.position.z);
   badge.rotation.z = -Math.atan2(direction.y, direction.x) + Math.PI / 2;
-};
-
-const placeCrown = (crown, head, time) => {
-  if (!crown || !head) return;
-  // Position corona directly above the head
-  crown.position.set(
-    head.position.x, 
-    3.2 + Math.sin(time / 320) * 0.08, 
-    head.position.z
-  );
-  
-  // Only rotate default 3D crown
-  if (!CROWN_CONFIG.useCustomTexture) {
-    crown.rotation.y += 0.015;
-  }
 };
 
 const createSnake = (startX = 0, startZ = 0) => {
@@ -644,7 +578,6 @@ const createOtherPlayer = (playerData) => {
     })),
     headUrl: playerData.headUrl || '',
     headBadge: null,
-    crown: null,
     usernameLabel: null,
     clanNameLabel: null,
     clanId: playerData.clanId || null,
@@ -691,7 +624,6 @@ const removeOtherPlayer = (socketId) => {
   if (!player) return;
   player.segments.forEach(removeObject);
   removeObject(player.headBadge);
-  removeObject(player.crown);
   if (player.usernameLabel) {
     scene.remove(player.usernameLabel);
     player.usernameLabel = null;
@@ -769,7 +701,6 @@ const updateLeaderboard = () => {
   const leaderboardEl = document.getElementById('leaderboard-list');
   if (!leaderboard.length) {
     leaderboardEl.innerHTML = '<div class="leaderboard-item"><span>...</span><span>0</span></div>';
-    updateCrowns();
     return;
   }
 
@@ -780,7 +711,6 @@ const updateLeaderboard = () => {
       <span><strong>${Number(player.score) || 0}</strong></span>
     </div>
   `).join('');
-  updateCrowns();
 };
 
 const updateLocalLeaderboardEntry = () => {
@@ -791,25 +721,6 @@ const updateLocalLeaderboardEntry = () => {
     leaderboard.push({ id: socket.id, username, score: playerScore, clanId: myClanId });
   }
   updateLeaderboard();
-};
-
-const updateCrowns = async () => {
-  const leaderId = leaderboard.length ? leaderboard[0].id : null;
-  if (leaderId === socket.id && !isDead) {
-    if (!localCrown) localCrown = await createCrownModel();
-  } else {
-    removeObject(localCrown);
-    localCrown = null;
-  }
-
-  otherPlayers.forEach(async (player, id) => {
-    if (id === leaderId) {
-      if (!player.crown) player.crown = await createCrownModel();
-    } else {
-      removeObject(player.crown);
-      player.crown = null;
-    }
-  });
 };
 
 const checkNoteCollisions = () => {
@@ -1181,7 +1092,6 @@ socket.on('initial-players', (playersList) => {
   otherPlayers.forEach((_, id) => {
     if (!visiblePlayers.has(id)) removeOtherPlayer(id);
   });
-  updateCrowns();
 });
 
 socket.on('chat-message', (data) => addChatMessage(data.username, data.message));
@@ -1317,10 +1227,9 @@ const updateNotes = (time, deltaTime) => {
 const updateAttachments = (time) => {
   if (snake.length) {
     placeBadge(localHeadBadge, snake[0], lastMoveDirection);
-    placeCrown(localCrown, snake[0], time);
     
-    // Nick and clan Y position (below crown)
-    const textY = 4.0;
+    // Nick and clan Y position - above head
+    const textY = 3.5;
     
     // Обновляем никнейм
     if (localUsernameLabel) {
@@ -1364,9 +1273,8 @@ const updateAttachments = (time) => {
     if (direction.lengthSq() < 0.001) direction.set(1, 0);
     direction.normalize();
     placeBadge(player.headBadge, head, direction);
-    placeCrown(player.crown, head, time);
     
-    const textY = 4.0;
+    const textY = 3.5;
     
     // Обновляем никнейм другого игрока
     if (player.usernameLabel) {
