@@ -3,36 +3,432 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>sekai-snake - Admin Panel</title>
+  <title>sekai-snake - Admin</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
-    h1 { margin-bottom: 30px; color: #333; }
-    .section { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-    .section h2 { margin-bottom: 15px; color: #444; }
+    body {
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #eef2ee;
+      color: #1d261f;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      background: #18241b;
+      color: white;
+    }
+    header h1 {
+      font-size: clamp(22px, 4vw, 34px);
+    }
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 24px auto;
+    }
+    .hidden { display: none !important; }
+    .panel {
+      background: white;
+      border: 1px solid #d9e0da;
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 12px 30px rgba(20, 31, 23, 0.08);
+    }
+    .panel h2 {
+      margin-bottom: 14px;
+      font-size: 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 14px;
+    }
+    .asset-card {
+      border: 1px solid #d9e0da;
+      border-radius: 8px;
+      padding: 10px;
+      background: #f8faf8;
+    }
+    .asset-card img {
+      width: 100%;
+      aspect-ratio: 1/1;
+      object-fit: contain;
+      background: #e8eee8;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .asset-name {
+      min-height: 34px;
+      font-size: 12px;
+      color: #526155;
+      overflow-wrap: anywhere;
+      margin-bottom: 8px;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    button, input {
+      font: inherit;
+    }
+    button {
+      border: none;
+      border-radius: 8px;
+      background: #2d8a4e;
+      color: white;
+      padding: 10px 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: #56645a;
+    }
+    button.danger {
+      background: #c74444;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      border: 1px solid #ccd6cf;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .login-box {
+      max-width: 420px;
+      margin: 60px auto;
+    }
+    .server-row,
+    .user-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-top: 1px solid #e2e8e3;
+    }
+    .server-row:first-child,
+    .user-row:first-child {
+      border-top: none;
+    }
+    .muted {
+      color: #637067;
+      font-size: 14px;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    #status {
+      min-height: 22px;
+      color: #2d8a4e;
+      font-weight: 700;
+    }
+    @media (max-width: 640px) {
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .server-row,
+      .user-row {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Админ-панель sekai-snake</h1>
-  
-  <div class="section">
-    <h2>Предложения голов</h2>
-    <div id="submissions-list"></div>
-  </div>
-  
-  <div class="section">
-    <h2>Все чаты</h2>
-    <div id="chat-list"></div>
-  </div>
-  
-  <div class="section">
-    <h2>Управление серверами</h2>
-    <div id="servers-admin-list"></div>
-  </div>
-  
-  <div class="section">
-    <h2>Управление игроками</h2>
-    <div id="users-admin-list"></div>
-  </div>
+  <header>
+    <h1>Админ-панель sekai-snake</h1>
+    <div class="actions">
+      <button class="secondary" id="back-lobby">В лобби</button>
+      <button class="danger hidden" id="logout">Выйти</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel login-box" id="login-panel">
+      <h2>Вход администратора</h2>
+      <input type="text" id="admin-username" placeholder="Логин">
+      <input type="password" id="admin-password" placeholder="Пароль">
+      <button id="admin-login">Войти</button>
+      <p class="muted" id="login-error"></p>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <div class="panel">
+        <div class="toolbar">
+          <div>
+            <h2>Твои головы для лобби</h2>
+            <p class="muted">Эти картинки видны игрокам в выборе головы.</p>
+          </div>
+          <div class="actions">
+            <input type="file" id="admin-head-file" accept="image/*">
+            <button id="upload-admin-head">Добавить голову</button>
+          </div>
+        </div>
+        <div id="heads-list" class="grid"></div>
+      </div>
+
+      <div class="panel">
+        <div class="toolbar">
+          <div>
+            <h2>Предложения игроков</h2>
+            <p class="muted">Принятая голова автоматически появится в лобби.</p>
+          </div>
+          <button class="secondary" id="refresh-submissions">Обновить</button>
+        </div>
+        <div id="submissions-list" class="grid"></div>
+      </div>
+
+      <div class="panel">
+        <div class="toolbar">
+          <div>
+            <h2>Серверы-комнаты</h2>
+            <p class="muted">Можно удалить одну комнату или очистить весь список.</p>
+          </div>
+          <button class="danger" id="clear-servers">Очистить все серверы</button>
+        </div>
+        <div id="servers-admin-list"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Игроки</h2>
+        <div id="users-admin-list"></div>
+      </div>
+
+      <div id="status"></div>
+    </section>
+  </main>
+
+  <script>
+    const tokenKey = 'token';
+    const userKey = 'currentUser';
+    let token = localStorage.getItem(tokenKey) || '';
+
+    const $ = (id) => document.getElementById(id);
+    const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[char]));
+
+    const setStatus = (message, isError = false) => {
+      $('status').textContent = message || '';
+      $('status').style.color = isError ? '#c74444' : '#2d8a4e';
+    };
+
+    const api = async (url, options = {}) => {
+      const headers = options.headers || {};
+      if (!(options.body instanceof FormData)) {
+        headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+      }
+      if (token) headers.Authorization = `Bearer ${token}`;
+      return fetch(url, { ...options, headers });
+    };
+
+    const showLogin = (message = '') => {
+      $('login-panel').classList.remove('hidden');
+      $('dashboard').classList.add('hidden');
+      $('logout').classList.add('hidden');
+      $('login-error').textContent = message;
+    };
+
+    const showDashboard = () => {
+      $('login-panel').classList.add('hidden');
+      $('dashboard').classList.remove('hidden');
+      $('logout').classList.remove('hidden');
+      loadAll();
+    };
+
+    const checkAdmin = async () => {
+      if (!token) {
+        showLogin();
+        return;
+      }
+      try {
+        const res = await api('/api/admin/me');
+        if (!res.ok) {
+          showLogin('Нужен вход под администратором.');
+          return;
+        }
+        showDashboard();
+      } catch (e) {
+        showLogin('Сервер недоступен.');
+      }
+    };
+
+    const renderAssets = (containerId, items, kind) => {
+      const container = $(containerId);
+      if (!items.length) {
+        container.innerHTML = '<p class="muted">Пусто.</p>';
+        return;
+      }
+      container.innerHTML = items.map(item => `
+        <div class="asset-card">
+          <img src="${item.url}" alt="${escapeHtml(item.filename)}">
+          <div class="asset-name">${escapeHtml(item.filename)}</div>
+          <div class="actions">
+            ${kind === 'submission' ? `<button data-action="approve" data-file="${escapeHtml(item.filename)}">Принять</button>` : ''}
+            <button class="danger" data-action="${kind === 'submission' ? 'reject' : 'delete-head'}" data-file="${escapeHtml(item.filename)}">Удалить</button>
+          </div>
+        </div>
+      `).join('');
+    };
+
+    const loadSubmissions = async () => {
+      const res = await api('/api/admin/submissions');
+      renderAssets('submissions-list', res.ok ? await res.json() : [], 'submission');
+    };
+
+    const loadHeads = async () => {
+      const res = await api('/api/admin/heads');
+      renderAssets('heads-list', res.ok ? await res.json() : [], 'head');
+    };
+
+    const loadServers = async () => {
+      const res = await api('/api/admin/servers');
+      const servers = res.ok ? await res.json() : [];
+      $('servers-admin-list').innerHTML = servers.length ? servers.map(server => `
+        <div class="server-row">
+          <div>
+            <strong>${escapeHtml(server.name)}</strong>
+            <div class="muted">ID: ${server.id} | ${escapeHtml(server.type)} | Игроков: ${server.players} | Создал: ${escapeHtml(server.creator || '-')}</div>
+          </div>
+          <button class="danger" data-action="delete-server" data-id="${server.id}">Удалить</button>
+        </div>
+      `).join('') : '<p class="muted">Серверов нет.</p>';
+    };
+
+    const loadUsers = async () => {
+  const res = await api('/api/admin/users');
+  const users = res.ok ? await res.json() : [];
+  $('users-admin-list').innerHTML = users.length ? users.map(user => `
+    <div class="user-row">
+      <div>
+        <strong>${escapeHtml(user.username)}</strong>
+        <span class="muted">${user.isAdmin ? 'Администратор' : 'Игрок'}</span>
+      </div>
+      ${!user.isAdmin ? `<button class="danger" data-action="delete-user" data-id="${user.id}">Удалить</button>` : ''}
+    </div>
+  `).join('') : '<p class="muted">Игроков нет.</p>';
+};
+
+    const loadAll = async () => {
+      setStatus('');
+      await Promise.all([loadHeads(), loadSubmissions(), loadServers(), loadUsers()]);
+    };
+
+    $('admin-login').addEventListener('click', async () => {
+      $('login-error').textContent = '';
+      const username = $('admin-username').value.trim();
+      const password = $('admin-password').value;
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.user || !data.user.isAdmin) {
+        $('login-error').textContent = 'Неверный админ-логин или пароль.';
+        return;
+      }
+      token = data.token;
+      localStorage.setItem(tokenKey, data.token);
+      localStorage.setItem(userKey, JSON.stringify(data.user));
+      showDashboard();
+    });
+
+    $('upload-admin-head').addEventListener('click', async () => {
+      const file = $('admin-head-file').files[0];
+      if (!file) {
+        setStatus('Выбери файл головы.', true);
+        return;
+      }
+      const formData = new FormData();
+      formData.append('adminHead', file);
+      const res = await api('/api/admin/heads', { method: 'POST', body: formData });
+      if (!res.ok) {
+        setStatus('Не удалось загрузить голову.', true);
+        return;
+      }
+      $('admin-head-file').value = '';
+      setStatus('Голова добавлена в лобби.');
+      await loadHeads();
+    });
+
+    $('submissions-list').addEventListener('click', async (e) => {
+      const button = e.target.closest('button[data-action]');
+      if (!button) return;
+      const file = button.dataset.file;
+      if (button.dataset.action === 'approve') {
+        const res = await api(`/api/admin/submissions/${encodeURIComponent(file)}/approve`, { method: 'POST' });
+        setStatus(res.ok ? 'Голова принята и добавлена в лобби.' : 'Не удалось принять голову.', !res.ok);
+      }
+      if (button.dataset.action === 'reject') {
+        const res = await api(`/api/admin/submissions/${encodeURIComponent(file)}`, { method: 'DELETE' });
+        setStatus(res.ok ? 'Заявка удалена.' : 'Не удалось удалить заявку.', !res.ok);
+      }
+      await Promise.all([loadHeads(), loadSubmissions()]);
+    });
+
+    $('heads-list').addEventListener('click', async (e) => {
+      const button = e.target.closest('button[data-action="delete-head"]');
+      if (!button) return;
+      const file = button.dataset.file;
+      const res = await api(`/api/admin/heads/${encodeURIComponent(file)}`, { method: 'DELETE' });
+      setStatus(res.ok ? 'Голова удалена из лобби.' : 'Не удалось удалить голову.', !res.ok);
+      await loadHeads();
+    });
+
+    $('servers-admin-list').addEventListener('click', async (e) => {
+      const button = e.target.closest('button[data-action="delete-server"]');
+      if (!button) return;
+      const res = await api(`/api/admin/servers/${button.dataset.id}`, { method: 'DELETE' });
+      setStatus(res.ok ? 'Сервер удален.' : 'Не удалось удалить сервер.', !res.ok);
+      await loadServers();
+    });
+
+    $('clear-servers').addEventListener('click', async () => {
+      if (!confirm('Удалить все серверы-комнаты?')) return;
+      const res = await api('/api/admin/servers', { method: 'DELETE' });
+      setStatus(res.ok ? 'Все серверы очищены.' : 'Не удалось очистить серверы.', !res.ok);
+      await loadServers();
+    });
+
+    $('users-admin-list').addEventListener('click', async (e) => {
+  const button = e.target.closest('button[data-action="delete-user"]');
+  if (!button) return;
+  if (!confirm('Удалить этого игрока?')) return;
+  const res = await api(`/api/admin/users/${button.dataset.id}`, { method: 'DELETE' });
+  setStatus(res.ok ? 'Игрок удалён' : 'Не удалось удалить игрока', !res.ok);
+  await loadUsers();
+});
+
+$('refresh-submissions').addEventListener('click', loadAll);
+$('back-lobby').addEventListener('click', () => { window.location.href = '/'; });
+$('logout').addEventListener('click', () => {
+  token = '';
+  localStorage.removeItem(tokenKey);
+  localStorage.removeItem(userKey);
+  showLogin();
+});
+
+    checkAdmin();
+  </script>
 </body>
 </html>

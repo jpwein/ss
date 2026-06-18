@@ -1,6 +1,6 @@
 {
-  "nextUserId": 3,
-  "nextServerId": 2,
+  "nextUserId": 6,
+  "nextServerId": 4,
   "users": [
     {
       "id": 1,
@@ -13,15 +13,34 @@
       "username": "weunnn",
       "password": "041111",
       "isAdmin": false
+    },
+    {
+      "id": 3,
+      "username": "admin",
+      "password": "sekai-admin-041111",
+      "isAdmin": true
+    },
+    {
+      "id": 4,
+      "username": "ururur",
+      "password": "041111",
+      "isAdmin": false
+    },
+    {
+      "id": 5,
+      "username": "weinn",
+      "password": "041111",
+      "isAdmin": false
     }
   ],
   "servers": [
     {
-      "id": 1,
-      "name": "при",
+      "id": 3,
+      "name": "папа",
       "type": "public",
       "password": null,
-      "creator": "wein"
+      "creator": "admin",
+      "createdAt": 1781796064699
     }
   ]
 }

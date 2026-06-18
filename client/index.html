@@ -8,6 +8,7 @@
 </head>
 <body>
   <div class="background-layer"></div>
+  <div id="css2d-container"></div>
   
   <header class="logo-header">
     <h1 class="game-logo">sekai-snake</h1>
@@ -22,13 +23,17 @@
       
       <div class="tab-content active" id="login-tab">
         <input type="text" class="input-field" id="login-username" placeholder="" maxlength="12">
+        <div class="input-hint" id="login-username-hint"></div>
         <input type="password" class="input-field" id="login-password" placeholder="" maxlength="24">
+        <div class="input-hint" id="login-password-hint"></div>
         <button class="action-btn" id="login-btn"></button>
       </div>
       
       <div class="tab-content" id="register-tab">
         <input type="text" class="input-field" id="register-username" placeholder="" maxlength="12">
+        <div class="input-hint" id="register-username-hint"></div>
         <input type="password" class="input-field" id="register-password" placeholder="" maxlength="24">
+        <div class="input-hint" id="register-password-hint"></div>
         <button class="action-btn" id="register-btn"></button>
       </div>
       
@@ -44,6 +49,9 @@
           <h2 id="customization-title"></h2>
           <div class="color-grid" id="color-grid"></div>
           <button class="action-btn" id="toggle-colors" style="margin-bottom: 15px;"></button>
+
+          <h2 id="head-select-title"></h2>
+          <div class="head-grid" id="head-grid"></div>
           <button class="action-btn" id="upload-head-btn"></button>
         </div>
         

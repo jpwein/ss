@@ -12,9 +12,14 @@ const translationsEN = {
   usernameTaken: "Username is already taken! Choose another one.",
   invalidCredentials: "Invalid username or password",
   personalCabinet: "Personal Cabinet",
+  chooseServerHint: "Choose a server on the right and start playing.",
   selectHead: "Select head model",
+  defaultHead: "No head",
+  noHeads: "No approved heads yet",
   selectColor: "Select snake color",
   submitHeadIdea: "Submit your head idea",
+  headSubmitted: "Submission sent!",
+  headSubmitFailed: "Could not send submission",
   uploadImage: "Upload image",
   serverList: "Server List",
   createServer: "Create Server",
@@ -41,5 +46,8 @@ const translationsEN = {
   noServers: "No available servers",
   loginRequired: "Log in first!",
   serverCreateFailed: "Could not create server",
-  serverUnavailable: "Server is unavailable"
+  serverUnavailable: "Server is unavailable",
+  // Input hints
+  usernameHint: "3 to 12 characters",
+  passwordHint: "6 to 24 characters"
 };
