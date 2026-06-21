@@ -1399,15 +1399,7 @@ const animate = (time) => {
       segment.material.opacity = burrowOpacity;
     });
     
-    // Также скрываем корону и значок головы
-    if (localCrown) {
-      localCrown.traverse(child => {
-        if (child.material) {
-          child.material.transparent = true;
-          child.material.opacity = burrowOpacity;
-        }
-      });
-    }
+    // Также скрываем значок головы
     if (localHeadBadge) {
       localHeadBadge.material.transparent = true;
       localHeadBadge.material.opacity = burrowOpacity;
