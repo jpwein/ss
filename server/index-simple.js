@@ -13,7 +13,11 @@ const io = socketIo(server, {
   cors: {
     origin: '*',
     methods: ['GET', 'POST', 'DELETE']
-  }
+  },
+  transports: ['websocket', 'polling'],
+  pingInterval: 10000,
+  pingTimeout: 5000,
+  connectTimeout: 10000
 });
 
 const PORT = process.env.PORT || 3000;

@@ -13,5 +13,11 @@ services:
           type: web
           name: sekai-snake
           envVarKey: PORT
+      - key: DATA_DIR
+        value: /var/data
     autoDeploy: true
     branch: main
+    disk:
+      name: sekai-snake-data
+      mountPath: /var/data
+      sizeGB: 1

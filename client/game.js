@@ -109,7 +109,11 @@ const getPersonalBonus = () => PLAYER_BONUSES[String(username || '').toLowerCase
 const getStartScore = () => Math.max(0, Number(getPersonalBonus().startScore) || 50);
 const getBaseMoveSpeed = () => 54 * (Number(getPersonalBonus().speedMultiplier) || 1);
 
-const socket = io();
+const socket = io({
+  transports: ['websocket', 'polling'],
+  pingInterval: 10000,
+  pingTimeout: 5000
+});
 const scene = new THREE.Scene();
 const dayColor = new THREE.Color(FIELD_DAY_COLOR);
 const nightColor = new THREE.Color(FIELD_NIGHT_COLOR);

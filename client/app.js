@@ -4,7 +4,11 @@ let currentUser = null;
 let selectedColor = '#00ff00';
 let selectedHeadUrl = '';
 let showAllColors = false;
-let socket = io();
+let socket = io({
+  transports: ['websocket', 'polling'],
+  pingInterval: 10000,
+  pingTimeout: 5000
+});
 let servers = [];
 let heads = [];
 
